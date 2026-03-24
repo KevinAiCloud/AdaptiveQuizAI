@@ -158,7 +158,7 @@ copy .env.example .env         # Windows
 cp .env.example .env           # macOS / Linux
 ```
 
-Open `.env` and fill in your keys:
+Open `.env` and fill in your keys :
 
 ```env
 OPENROUTER_API_KEY=sk-or-v1-your-key-here
