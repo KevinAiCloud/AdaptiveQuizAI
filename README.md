@@ -230,7 +230,7 @@ python main.py
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenshots -
 
 > *Coming soon — run the app locally to see the glassmorphic UI in action!*
 
