@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Library — AdaptiveQuiz{% endblock %}
+
+{% block content %}
+<div class="container fade-in" style="margin-top: 2rem;">
+    <div class="flex-between mb-3">
+        <h2>📚 Quiz Library</h2>
+        <a href="{{ url_for('routes.dashboard') }}" class="btn btn-secondary">← Dashboard</a>
+    </div>
+
+    {% if results %}
+    <div class="glass">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <th style="padding: 0.75rem; text-align: left; color: var(--text-muted); font-size: 0.85rem;">Date</th>
+                    <th style="padding: 0.75rem; text-align: left; color: var(--text-muted); font-size: 0.85rem;">Topic</th>
+                    <th style="padding: 0.75rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Score</th>
+                    <th style="padding: 0.75rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Accuracy</th>
+                    <th style="padding: 0.75rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Difficulty</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in results %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <td style="padding: 0.75rem; color: var(--text-secondary);">{{ r.timestamp.strftime('%d %b %Y') }}</td>
+                    <td style="padding: 0.75rem;">{{ r.topic or 'General' }}</td>
+                    <td style="padding: 0.75rem; text-align: center;">
+                        <strong>{{ r.score }}</strong> / {{ r.total_questions }}
+                    </td>
+                    <td style="padding: 0.75rem; text-align: center;">
+                        {% set acc = (r.score / r.total_questions * 100) if r.total_questions else 0 %}
+                        <span class="badge {{ 'badge-success' if acc >= 70 else 'badge-warning' if acc >= 50 else 'badge-danger' }}">
+                            {{ "%.0f"|format(acc) }}%
+                        </span>
+                    </td>
+                    <td style="padding: 0.75rem; text-align: center;">
+                        <span class="badge badge-primary">{{ r.difficulty or 'medium' }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="glass text-center" style="padding: 3rem;">
+        <div style="font-size: 3rem;">📭</div>
+        <h3 class="mt-2">No quizzes yet!</h3>
+        <p class="text-secondary mt-1">Take your first quiz from the dashboard to start building your library.</p>
+        <a href="{{ url_for('routes.dashboard') }}" class="btn btn-primary mt-2">🎯 Start a Quiz</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

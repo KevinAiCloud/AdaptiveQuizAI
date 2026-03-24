@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Mistake Bank — AdaptiveQuiz{% endblock %}
+
+{% block content %}
+<div class="container fade-in" style="margin-top: 2rem;">
+    <div class="flex-between mb-3">
+        <h2>🔍 Mistake Bank</h2>
+        <div class="flex gap-2">
+            {% if mistakes %}
+            <form method="POST" action="{{ url_for('routes.handle_generation') }}" style="display:inline;">
+                <input type="hidden" name="source_type" value="mistake">
+                <input type="hidden" name="count" value="{{ mistakes|length }}">
+                <button type="submit" class="btn btn-primary">🔄 Re-Quiz Mistakes</button>
+            </form>
+            {% endif %}
+            <a href="{{ url_for('routes.dashboard') }}" class="btn btn-secondary">← Dashboard</a>
+        </div>
+    </div>
+
+    {% if mistakes %}
+        {% for m in mistakes %}
+        <div class="glass mb-2">
+            <div class="flex-between mb-1">
+                <span class="badge badge-primary">{{ m.topic or 'General' }}</span>
+                <form method="POST" action="{{ url_for('routes.delete_mistake', m_id=m.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" title="Remove">✕</button>
+                </form>
+            </div>
+            <h3 style="font-size:1rem; margin-bottom: 0.5rem;">{{ m.question }}</h3>
+            <p class="text-secondary" style="font-size:0.9rem;">
+                ✅ Correct Answer: <strong style="color: #55efc4;">
+                    {% if m.options %}
+                        {{ m.options.get(m.correct_answer, m.correct_answer) }}
+                    {% else %}
+                        {{ m.correct_answer }}
+                    {% endif %}
+                </strong>
+            </p>
+            {% if m.explanation %}
+            <p class="text-muted mt-1" style="font-size:0.85rem;">💡 {{ m.explanation }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="glass text-center" style="padding: 3rem;">
+            <div style="font-size: 3rem;">🎉</div>
+            <h3 class="mt-2">No Mistakes!</h3>
+            <p class="text-secondary mt-1">Your Mistake Bank is empty. Keep up the great work!</p>
+            <a href="{{ url_for('routes.dashboard') }}" class="btn btn-primary mt-2">🎯 Take a Quiz</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

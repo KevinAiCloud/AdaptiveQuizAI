@@ -1,0 +1,13 @@
+__pycache__
+*.pyc
+*.pyo
+.git
+.env
+*.db
+*.sqlite3
+backend/venv
+backend/uploads
+.pytest_cache
+node_modules
+README.md
+.env.example

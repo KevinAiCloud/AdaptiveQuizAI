@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — AdaptiveQuiz{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <!-- Welcome -->
+    <div class="flex-between mb-3">
+        <div>
+            <h1>Welcome, {{ username }}! 👋</h1>
+            <p class="text-secondary mt-1">{{ fun_fact }}</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="#generate" class="btn btn-primary">🎯 New Quiz</a>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid-4 mb-3">
+        <div class="glass stat-card">
+            <div class="stat-value">{{ correct_total }}</div>
+            <div class="stat-label">✅ Correct Answers</div>
+        </div>
+        <div class="glass stat-card">
+            <div class="stat-value">{{ incorrect_total }}</div>
+            <div class="stat-label">❌ Incorrect</div>
+        </div>
+        <div class="glass stat-card">
+            <div class="stat-value">🔥 {{ streak }}</div>
+            <div class="stat-label">Day Streak</div>
+        </div>
+        <div class="glass stat-card">
+            <div class="stat-value">{{ total_quizzes }}</div>
+            <div class="stat-label">📝 Quizzes Taken</div>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-3">
+        <!-- Topic Mastery -->
+        <div class="glass">
+            <h3 class="mb-2">🎓 Topic Mastery</h3>
+            {% if topic_mastery %}
+                {% for m in topic_mastery %}
+                <div class="mastery-item">
+                    <div class="mastery-label">
+                        <span>{{ m.topic }}</span>
+                        <span class="text-secondary">{{ m.percentage }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ m.percentage }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No topics mastered yet. Start a quiz to begin!</p>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="glass">
+            <h3 class="mb-2">⚡ Quick Actions</h3>
+            <div class="flex-col gap-2">
+                {% if not is_guest %}
+                <a href="{{ url_for('routes.review_mistakes') }}" class="btn btn-secondary" style="width:100%;">🔍 Review Mistakes ({{ mistake_count }})</a>
+                <a href="{{ url_for('routes.library') }}" class="btn btn-secondary" style="width:100%;">📚 Quiz Library</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Generator -->
+    <div class="glass mb-3" id="generate">
+        <h3 class="mb-2">🎯 Generate a New Quiz</h3>
+        <p class="text-secondary mb-2">Choose your source and let AI create your assessment.</p>
+
+        <!-- Source type tabs -->
+        <div class="source-tabs">
+            <button class="source-tab active" onclick="switchSource('topic')">💡 Topic</button>
+            <button class="source-tab" onclick="switchSource('text')">📝 Text</button>
+            <button class="source-tab" onclick="switchSource('pdf')">📄 PDF</button>
+            <button class="source-tab" onclick="switchSource('image')">🖼️ Image</button>
+            {% if not is_guest %}
+            <button class="source-tab" onclick="switchSource('mistake')">🔄 Mistake Bank</button>
+            {% endif %}
+        </div>
+
+        <form method="POST" action="{{ url_for('routes.handle_generation') }}" enctype="multipart/form-data" id="quizForm">
+            <input type="hidden" name="source_type" id="source_type" value="topic">
+
+            <!-- Topic panel -->
+            <div class="source-panel active" id="panel-topic">
+                <div class="form-group">
+                    <label class="form-label">Enter a Topic</label>
+                    <input type="text" name="topic_name" class="form-control" placeholder="e.g. Machine Learning, Photosynthesis, World War II">
+                </div>
+            </div>
+
+            <!-- Text panel -->
+            <div class="source-panel" id="panel-text">
+                <div class="form-group">
+                    <label class="form-label">Paste Your Content</label>
+                    <textarea name="raw_text" class="form-control" placeholder="Paste any study material, notes, or article text here..."></textarea>
+                </div>
+            </div>
+
+            <!-- PDF panel -->
+            <div class="source-panel" id="panel-pdf">
+                <div class="form-group">
+                    <label class="form-label">Upload PDF <span class="text-muted" style="font-size:0.8rem;">(any size — processed in browser)</span></label>
+                    <input type="file" id="pdfFileInput" class="form-control" accept=".pdf">
+                    <input type="hidden" name="raw_text" id="pdfExtractedText">
+                    <p id="pdfStatus" class="text-muted mt-1" style="font-size:0.85rem; display:none;"></p>
+                </div>
+            </div>
+
+            <!-- Image panel -->
+            <div class="source-panel" id="panel-image">
+                <div class="form-group">
+                    <label class="form-label">Upload Image <span class="text-muted" style="font-size:0.8rem;">(max 4MB)</span></label>
+                    <input type="file" name="image_file" class="form-control" accept="image/*">
+                </div>
+            </div>
+
+            <!-- Mistake panel -->
+            <div class="source-panel" id="panel-mistake">
+                <p class="text-secondary">Re-quiz yourself on questions you got wrong. AI will re-generate from your Mistake Bank.</p>
+            </div>
+
+            <!-- Options row -->
+            <div class="grid-3 mt-2">
+                <div class="form-group">
+                    <label class="form-label">Questions</label>
+                    <select name="count" class="form-control">
+                        <option value="5">5 Questions</option>
+                        <option value="10" selected>10 Questions</option>
+                        <option value="15">15 Questions</option>
+                        <option value="20">20 Questions</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Format</label>
+                    <select name="q_format" class="form-control">
+                        <option value="mcq">📋 Multiple Choice</option>
+                        <option value="tf">✅ True / False</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Difficulty</label>
+                    <select name="difficulty" class="form-control">
+                        <option value="easy">🟢 Easy</option>
+                        <option value="medium" selected>🟡 Medium</option>
+                        <option value="hard">🔴 Hard</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" id="generateBtn" style="width:100%;">🚀 Generate Quiz</button>
+        </form>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay" style="display:none;">
+    <div class="loading-content glass">
+        <div class="loading-spinner"></div>
+        <h3 class="mt-2" style="color:var(--primary-light);">Generating Your Quiz...</h3>
+        <p class="text-secondary mt-1" id="loadingTip">AI is crafting questions from your content</p>
+        <div class="loading-dots mt-2">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function switchSource(type) {
+    document.querySelectorAll('.source-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.source-panel').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('panel-' + type).classList.add('active');
+    document.getElementById('source_type').value = type;
+}
+
+// Loading animation on form submit
+const quizForm = document.getElementById('quizForm');
+const loadingOverlay = document.getElementById('loadingOverlay');
+const tips = [
+    'AI is crafting questions from your content',
+    'Analyzing difficulty levels...',
+    'Building answer explanations...',
+    'Almost there — finalizing your quiz...',
+    'Creating challenging options...',
+    'This usually takes 10-20 seconds...'
+];
+
+quizForm.addEventListener('submit', function(e) {
+    // Check image file size (PDF is handled client-side now)
+    const imageInput = quizForm.querySelector('input[name="image_file"]');
+    if (imageInput && imageInput.files.length > 0 && imageInput.files[0].size > 4 * 1024 * 1024) {
+        e.preventDefault();
+        alert('Image is too large! Maximum size is 4MB.');
+        return;
+    }
+
+    // For PDF source: switch source_type to 'text' since we extracted text client-side
+    const sourceType = document.getElementById('source_type').value;
+    if (sourceType === 'pdf') {
+        const extractedText = document.getElementById('pdfExtractedText').value;
+        if (!extractedText) {
+            e.preventDefault();
+            alert('Please upload a PDF first and wait for it to be processed.');
+            return;
+        }
+        document.getElementById('source_type').value = 'text';
+    }
+
+    loadingOverlay.style.display = 'flex';
+    document.getElementById('generateBtn').disabled = true;
+    let tipIdx = 0;
+    setInterval(function() {
+        tipIdx = (tipIdx + 1) % tips.length;
+        document.getElementById('loadingTip').textContent = tips[tipIdx];
+    }, 3000);
+});
+
+// Client-side PDF text extraction using pdf.js
+const pdfFileInput = document.getElementById('pdfFileInput');
+if (pdfFileInput) {
+    pdfFileInput.addEventListener('change', async function() {
+        const file = this.files[0];
+        if (!file) return;
+
+        const status = document.getElementById('pdfStatus');
+        status.style.display = 'block';
+        status.textContent = '⏳ Reading PDF...';
+        status.style.color = 'var(--warning)';
+
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                status.textContent = `⏳ Processing page ${i} of ${pdf.numPages}...`;
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                const pageText = content.items.map(item => item.str).join(' ');
+                fullText += pageText + '\n';
+            }
+
+            document.getElementById('pdfExtractedText').value = fullText.trim();
+            status.textContent = `✅ PDF processed! ${pdf.numPages} page(s), ${fullText.trim().split(/\s+/).length} words extracted.`;
+            status.style.color = 'var(--success)';
+        } catch (err) {
+            console.error('PDF extraction error:', err);
+            status.textContent = '❌ Could not read PDF. Try a different file or paste text instead.';
+            status.style.color = 'var(--danger)';
+        }
+    });
+}
+</script>
+{% endblock %}

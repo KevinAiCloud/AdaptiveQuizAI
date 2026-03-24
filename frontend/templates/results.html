@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Results — AdaptiveQuiz{% endblock %}
+
+{% block content %}
+<div class="container-md fade-in" style="margin-top: 2rem;">
+    <!-- Score Card -->
+    <div class="glass text-center mb-3">
+        <h2 class="mb-1">🏆 Quiz Complete!</h2>
+        <p class="text-secondary mb-2">{{ topic }}</p>
+
+        <div class="stat-value" style="font-size: 4rem;">
+            {% if accuracy >= 80 %}😄{% elif accuracy >= 50 %}🙂{% else %}📚{% endif %}
+        </div>
+        <div class="stat-value mt-1">{{ score }} / {{ total }}</div>
+        <p class="text-secondary mt-1">{{ "%.0f"|format(accuracy) }}% Accuracy</p>
+
+        <div class="progress mt-2" style="height:12px; max-width:400px; margin:0 auto;">
+            <div class="progress-bar" style="width:{{ accuracy }}%;
+                background: {% if accuracy >= 80 %}linear-gradient(90deg, #00b894, #55efc4){% elif accuracy >= 50 %}linear-gradient(90deg, #fdcb6e, #ffeaa7){% else %}linear-gradient(90deg, #d63031, #ff7675){% endif %};">
+            </div>
+        </div>
+
+        <!-- Performance tier -->
+        <div class="mt-2">
+            {% if accuracy >= 90 %}
+                <span class="badge badge-success" style="font-size:1rem; padding:0.5rem 1rem;">🏆 Expert — Outstanding Mastery!</span>
+            {% elif accuracy >= 70 %}
+                <span class="badge badge-primary" style="font-size:1rem; padding:0.5rem 1rem;">🥈 Proficient — Well Done!</span>
+            {% elif accuracy >= 50 %}
+                <span class="badge badge-warning" style="font-size:1rem; padding:0.5rem 1rem;">🥉 Intermediate — Keep Improving!</span>
+            {% else %}
+                <span class="badge badge-danger" style="font-size:1rem; padding:0.5rem 1rem;">📚 Needs Review — Keep Practicing!</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid-2 mb-3">
+        <!-- Performance Chart -->
+        <div class="glass">
+            <h3 class="mb-2">📈 Performance History</h3>
+            <canvas id="historyChart" height="200"></canvas>
+        </div>
+
+        <!-- AI Insight -->
+        <div class="glass">
+            <h3 class="mb-2">🧠 AI Learning Insight</h3>
+            {% if ai_insight %}
+                <p style="line-height:1.7;">{{ ai_insight }}</p>
+            {% else %}
+                <p class="text-secondary">
+                    {% if accuracy >= 80 %}
+                        Excellent performance! You've shown strong mastery of this material. Consider challenging yourself with harder difficulty or a new topic.
+                    {% elif accuracy >= 50 %}
+                        Good attempt! Review the questions you missed below for deeper understanding.
+                    {% else %}
+                        Don't worry — learning takes practice! Review the questions below, then re-attempt this topic.
+                    {% endif %}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Answer Review -->
+    <div class="glass mb-3">
+        <h3 class="mb-2">📋 Answer Review</h3>
+        {% for ans in user_answers %}
+        <div class="answer-card {{ 'correct' if ans.is_correct else 'wrong' }}">
+            <div class="flex-between mb-1">
+                <strong>Q{{ loop.index }}. {{ ans.question }}</strong>
+                {% if ans.is_correct %}
+                    <span class="badge badge-success">✅ Correct</span>
+                {% else %}
+                    <span class="badge badge-danger">❌ Wrong</span>
+                {% endif %}
+            </div>
+            {% if not ans.is_correct %}
+            <p class="text-secondary" style="font-size:0.9rem;">
+                Your answer: <strong style="color:#ff7675;">{{ ans.options.get(ans.user_answer, ans.user_answer) }}</strong><br>
+                Correct: <strong style="color:#55efc4;">{{ ans.options.get(ans.correct_answer, ans.correct_answer) }}</strong>
+            </p>
+            {% endif %}
+            {% if ans.explanation %}
+            <p class="mt-1" style="font-size:0.85rem; color: var(--text-muted);">💡 {{ ans.explanation }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Actions -->
+    <div class="flex-center gap-2 mb-3">
+        <a href="{{ url_for('routes.dashboard') }}" class="btn btn-primary">📊 Back to Dashboard</a>
+        {% if not is_guest %}
+        <a href="{{ url_for('routes.review_mistakes') }}" class="btn btn-secondary">🔍 Review Mistakes</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const labels = {{ history_labels|safe }};
+const scores = {{ history_scores|safe }};
+
+if (labels.length > 0) {
+    new Chart(document.getElementById('historyChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Accuracy %',
+                data: scores,
+                borderColor: '#6c5ce7',
+                backgroundColor: 'rgba(108, 92, 231, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#a29bfe',
+                pointBorderColor: '#6c5ce7',
+                pointRadius: 5,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: 'rgba(255,255,255,0.5)' }
+                },
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: 'rgba(255,255,255,0.5)' }
+                }
+            },
+            plugins: {
+                legend: { labels: { color: 'rgba(255,255,255,0.7)' } }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

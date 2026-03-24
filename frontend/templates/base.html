@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AdaptiveQuiz{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% block navbar %}
+    <nav class="navbar">
+        <a href="{{ url_for('routes.index') }}" class="nav-brand">🧠 AdaptiveQuiz</a>
+        <div class="nav-links">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('routes.dashboard') }}" class="nav-link">📊 Dashboard</a>
+                <a href="{{ url_for('routes.library') }}" class="nav-link">📚 Library</a>
+                <a href="{{ url_for('routes.review_mistakes') }}" class="nav-link">🔍 Mistakes</a>
+                <a href="{{ url_for('routes.logout') }}" class="nav-link">🚪 Logout</a>
+            {% elif session.get('is_guest') %}
+                <a href="{{ url_for('routes.dashboard') }}" class="nav-link">📊 Dashboard</a>
+                <a href="{{ url_for('routes.logout') }}" class="nav-link">🚪 Exit Guest</a>
+            {% else %}
+                <a href="{{ url_for('routes.login') }}" class="nav-link">🔑 Login</a>
+                <a href="{{ url_for('routes.signup') }}" class="nav-link">✨ Sign Up</a>
+            {% endif %}
+        </div>
+    </nav>
+    {% endblock %}
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="container" style="padding-bottom:0;">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} fade-in">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

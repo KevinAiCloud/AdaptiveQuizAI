@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Quiz — AdaptiveQuiz{% endblock %}
+
+{% block content %}
+<div class="container-md fade-in" style="margin-top: 2rem;">
+    <div class="glass">
+        <!-- Header -->
+        <div class="flex-between mb-2">
+            <div>
+                <span class="badge badge-primary">{{ topic }}</span>
+                <span class="badge badge-warning" style="margin-left:0.25rem;">Question {{ current }} of {{ total }}</span>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress mb-3">
+            <div class="progress-bar" style="width: {{ (current / total * 100) if total > 0 else 0 }}%"></div>
+        </div>
+
+        <!-- Question -->
+        <h2 class="mb-3">{{ question.question_text }}</h2>
+
+        <!-- Options -->
+        <form method="POST" action="{{ url_for('routes.submit_answer') }}" id="quizForm">
+            <input type="hidden" name="question_id" value="{{ question.id }}">
+            <input type="hidden" name="answer" id="selectedAnswer" value="">
+
+            <div class="flex-col gap-2 mb-3">
+                {% for key, value in options.items() %}
+                <div class="option-card" onclick="selectOption('{{ key }}', this)">
+                    <div class="option-key">{{ key }}</div>
+                    <div style="flex:1;">{{ value }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;" id="submitBtn" disabled>
+                {% if current < total %}
+                Next Question →
+                {% else %}
+                Finish Quiz 🏆
+                {% endif %}
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function selectOption(key, el) {
+    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('selectedAnswer').value = key;
+    document.getElementById('submitBtn').disabled = false;
+}
+</script>
+{% endblock %}

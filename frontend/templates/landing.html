@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}AdaptiveQuiz — AI-Powered Learning{% endblock %}
+
+{% block navbar %}
+<nav class="navbar">
+    <a href="{{ url_for('routes.index') }}" class="nav-brand">🧠 AdaptiveQuiz</a>
+    <div class="nav-links">
+        <a href="{{ url_for('routes.login') }}" class="nav-link">🔑 Login</a>
+        <a href="{{ url_for('routes.signup') }}" class="btn btn-primary btn-sm">Get Started</a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="hero fade-in">
+    <div class="hero-badge">🚀 AI-Powered Adaptive Learning</div>
+    <h1>Master Any Topic<br><span class="text-gradient">Intelligently</span></h1>
+    <p>Transform any content into personalized quizzes, study aids, and adaptive assessments powered by Llama 3.3 AI.</p>
+    <div class="flex-center gap-2">
+        <a href="{{ url_for('routes.signup') }}" class="btn btn-primary btn-lg">Start Learning Free →</a>
+        <a href="{{ url_for('routes.guest_login') }}" class="btn btn-secondary btn-lg">Try as Guest</a>
+    </div>
+</section>
+
+<div class="container">
+    <!-- Features -->
+    <div class="grid-3 mb-3">
+        <div class="glass feature-card fade-in">
+            <div class="feature-icon">🤖</div>
+            <h3>AI Question Engine</h3>
+            <p>Llama 3.3 generates contextual MCQs and True/False questions from any content — PDFs, text, or topics.</p>
+        </div>
+        <div class="glass feature-card fade-in">
+            <div class="feature-icon">📈</div>
+            <h3>Adaptive Difficulty</h3>
+            <p>Questions dynamically adjust based on your performance. Score high? Get challenged. Struggling? Get support.</p>
+        </div>
+
+        <div class="glass feature-card fade-in">
+            <div class="feature-icon">📊</div>
+            <h3>Smart Analytics</h3>
+            <p>Track your progress with detailed performance charts, topic mastery scores, and learning streaks.</p>
+        </div>
+        <div class="glass feature-card fade-in">
+            <div class="feature-icon">🎯</div>
+            <h3>Mistake Bank</h3>
+            <p>Every wrong answer is saved. Re-quiz yourself on weak areas to strengthen knowledge gaps.</p>
+        </div>
+        <div class="glass feature-card fade-in">
+            <div class="feature-icon">📄</div>
+            <h3>Multi-Source Input</h3>
+            <p>Upload PDFs, paste text, enter topics, or scan images — our AI handles all formats.</p>
+        </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="glass text-center mb-3 fade-in" style="padding: 3rem;">
+        <h2 class="mb-2">How It Works</h2>
+        <div class="grid-4">
+            <div>
+                <div style="font-size: 2rem;">📤</div>
+                <h3 class="mt-1">1. Upload</h3>
+                <p class="text-secondary mt-1">Add your study material — text, PDF, topic, or image.</p>
+            </div>
+            <div>
+                <div style="font-size: 2rem;">🧠</div>
+                <h3 class="mt-1">2. AI Processes</h3>
+                <p class="text-secondary mt-1">Llama 3.3 analyzes content and generates questions.</p>
+            </div>
+            <div>
+                <div style="font-size: 2rem;">📝</div>
+                <h3 class="mt-1">3. Take Quiz</h3>
+                <p class="text-secondary mt-1">Answer adaptive questions with instant feedback.</p>
+            </div>
+            <div>
+                <div style="font-size: 2rem;">🏆</div>
+                <h3 class="mt-1">4. Master</h3>
+                <p class="text-secondary mt-1">Review mistakes, track progress, achieve mastery.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="text-center mb-3">
+        <h3 class="text-muted mb-2">Built With</h3>
+        <div class="tech-stack">
+            <div class="tech-item"><span>🐍</span> Python</div>
+            <div class="tech-item"><span>🌶️</span> Flask</div>
+            <div class="tech-item"><span>🤖</span> Groq AI</div>
+            <div class="tech-item"><span>🗄️</span> SQLite</div>
+            <div class="tech-item"><span>🎨</span> Glassmorphic UI</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

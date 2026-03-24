@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Study Hub — AdaptiveQuiz{% endblock %}
+
+{% block content %}
+<div class="container-md fade-in" style="margin-top: 2rem;">
+    <div class="glass">
+        <h2 class="mb-1">⚡ AI Study Hub</h2>
+        <p class="text-secondary mb-3">Upload content and let AI create personalized study materials — notes, mnemonics, ELI10 explanations, and flashcards.</p>
+
+        <!-- Source tabs -->
+        <div class="source-tabs">
+            <button class="source-tab active" onclick="switchSrc('topic')">💡 Topic</button>
+            <button class="source-tab" onclick="switchSrc('text')">📝 Text</button>
+            <button class="source-tab" onclick="switchSrc('pdf')">📄 PDF</button>
+            <button class="source-tab" onclick="switchSrc('image')">🖼️ Image</button>
+        </div>
+
+        <form method="POST" action="{{ url_for('routes.study_hub') }}" enctype="multipart/form-data">
+            <input type="hidden" name="source_type" id="src_type" value="topic">
+
+            <div class="source-panel active" id="sp-topic">
+                <div class="form-group">
+                    <label class="form-label">Enter a Topic</label>
+                    <input type="text" name="topic_name" class="form-control" placeholder="e.g. Quantum Computing, DNA Replication">
+                </div>
+            </div>
+
+            <div class="source-panel" id="sp-text">
+                <div class="form-group">
+                    <label class="form-label">Paste Your Content</label>
+                    <textarea name="raw_text" class="form-control" placeholder="Paste any study material here..."></textarea>
+                </div>
+            </div>
+
+            <div class="source-panel" id="sp-pdf">
+                <div class="form-group">
+                    <label class="form-label">Upload PDF</label>
+                    <input type="file" name="pdf_file" class="form-control" accept=".pdf">
+                </div>
+            </div>
+
+            <div class="source-panel" id="sp-image">
+                <div class="form-group">
+                    <label class="form-label">Upload Image</label>
+                    <input type="file" name="image_file" class="form-control" accept="image/*">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg mt-2" style="width:100%;">🧠 Generate Study Material</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function switchSrc(type) {
+    document.querySelectorAll('.source-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.source-panel').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('sp-' + type).classList.add('active');
+    document.getElementById('src_type').value = type;
+}
+</script>
+{% endblock %}

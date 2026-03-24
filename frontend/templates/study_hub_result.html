@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Study Material — AdaptiveQuiz{% endblock %}
+
+{% block content %}
+<div class="container fade-in" style="margin-top: 2rem;">
+    <div class="flex-between mb-3">
+        <h2>⚡ Your AI Study Material</h2>
+        <a href="{{ url_for('routes.study_hub') }}" class="btn btn-secondary">← New Material</a>
+    </div>
+
+    <div class="grid-2 mb-3">
+        <!-- Shorthand Notes -->
+        <div class="glass">
+            <h3 class="mb-2">📝 Shorthand Notes</h3>
+            {% if material.shorthand_notes %}
+                <ul style="list-style: none; padding: 0;">
+                {% for note in material.shorthand_notes %}
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--glass-border); color: var(--text-secondary);">
+                        ▸ {{ note }}
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No notes generated.</p>
+            {% endif %}
+        </div>
+
+        <!-- ELI10 -->
+        <div class="glass">
+            <h3 class="mb-2">🧒 Explain Like I'm 10</h3>
+            <p style="line-height: 1.8; color: var(--text-secondary);">
+                {{ material.get('eli10', 'No ELI10 explanation available.') }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Mnemonic Story -->
+    {% if material.get('mnemonic_story') %}
+    <div class="glass mb-3">
+        <h3 class="mb-2">🧠 Memory Story (Mnemonic)</h3>
+        <p style="line-height: 1.8; color: var(--text-secondary); font-style: italic;">
+            {{ material.mnemonic_story }}
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Key Concepts -->
+    {% if material.get('key_concepts') %}
+    <div class="glass mb-3">
+        <h3 class="mb-2">🎯 Key Concepts</h3>
+        <div class="flex gap-2" style="flex-wrap: wrap;">
+            {% for concept in material.key_concepts %}
+                <span class="badge badge-primary" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">{{ concept }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Flashcards -->
+    {% if material.get('flashcards') %}
+    <div class="glass mb-3">
+        <h3 class="mb-2">🃏 Flashcards <span class="text-muted" style="font-size:0.8rem;">(click to flip)</span></h3>
+        <div class="grid-3">
+            {% for card in material.flashcards %}
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front glass-sm">
+                        <strong>{{ card.get('front', card) if card is mapping else card }}</strong>
+                    </div>
+                    <div class="flip-card-back glass-sm">
+                        <span>{{ card.get('back', '') if card is mapping else '' }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="flex-center gap-2 mb-3">
+        <a href="{{ url_for('routes.dashboard') }}" class="btn btn-primary">📊 Dashboard</a>
+        <a href="{{ url_for('routes.study_hub') }}" class="btn btn-secondary">⚡ Generate More</a>
+    </div>
+</div>
+{% endblock %}
