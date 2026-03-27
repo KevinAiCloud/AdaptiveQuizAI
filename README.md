@@ -27,7 +27,7 @@ An intelligent quiz platform that leverages **Llama 3.3 70B** (via OpenRouter) t
   </tr>
   <tr>
     <td>📊 <strong>Adaptive Difficulty</strong></td>
-    <td>Questions adapt based on your performance — Easy, Medium, or Hard</td>
+    <td>Questions adapt based on your performance — Easy, Medium, Hard</td>
   </tr>
   <tr>
     <td>📧 <strong>Email OTP Verification</strong></td>
