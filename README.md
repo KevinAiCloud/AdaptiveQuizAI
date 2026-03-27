@@ -82,7 +82,7 @@ An intelligent quiz platform that leverages **Llama 3.3 70B** (via OpenRouter) t
 ├─────────────────────────────────────────────────────────┤
 │  SERVICES          Gmail SMTP (OTP) · pypdf             │
 ├─────────────────────────────────────────────────────────┤
-│  DEPLOYMENT        Vercel (Python Serverless)           │
+│  DEPLOYMENT       Vercel (Python Serverless)           │
 └─────────────────────────────────────────────────────────┘
 ```
 
