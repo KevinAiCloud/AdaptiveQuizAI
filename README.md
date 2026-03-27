@@ -18,7 +18,7 @@ An intelligent quiz platform that leverages **Llama 3.3 70B** (via OpenRouter) t
 
 ---
 
-## ✨ Features
+## ✨Features
 
 <table>
   <tr>
